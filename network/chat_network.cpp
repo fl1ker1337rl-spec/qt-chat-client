@@ -9,11 +9,11 @@
 
 ChatNetwork::ChatNetwork(QObject *parent) : QObject(parent), socket_(new QTcpSocket(this)){
 
-    // 1. Генерируем ID пользователя при создании объекта
+    // 1. Generate user ID upon object creation
     clientId_ = QUuid::createUuid().toString(QUuid::WithoutBraces);
-    qDebug() << "ID пользователя:" << clientId_;
+    qDebug() << "User ID:" << clientId_;
 
-    // 2. Обработка входящих данных от сервера
+    // 2. Handle incoming data from the server
     connect(socket_, &QTcpSocket::readyRead, this, [this](){
         QByteArray data = socket_->readAll();
         QJsonDocument doc = QJsonDocument::fromJson(data);
@@ -31,11 +31,11 @@ ChatNetwork::ChatNetwork(QObject *parent) : QObject(parent), socket_(new QTcpSoc
                     QVariantMap map;
                     map["id"] = userObj["id"].toString();
                     map["name"] = userObj["name"].toString();
-                    map["lastMsg"] = "В сети";
+                    map["lastMsg"] = "Online";
                     listForQml.append(map);
                 }
 
-                // Эмитим сигнал в QML с новым списком пользователей
+                // Emit signal to QML with the new user list
                 emit userListReceived(listForQml);
             }
             else if (type == "private_message") {
@@ -48,9 +48,9 @@ ChatNetwork::ChatNetwork(QObject *parent) : QObject(parent), socket_(new QTcpSoc
         }
     });
 
-    // 3. Когда соединение УСПЕШНО установлено — отправляем регистрацию
+    // 3. When connection is SUCCESSFULLY established — send registration
     connect(socket_, &QTcpSocket::connected, this, [this](){
-        qDebug() << "Клиент успешно подключился к серверу!";
+        qDebug() << "Client successfully connected to the server!";
 
         QJsonObject regObj;
         regObj["type"] = "register";
@@ -60,7 +60,7 @@ ChatNetwork::ChatNetwork(QObject *parent) : QObject(parent), socket_(new QTcpSoc
     });
 
     connect(socket_, &QTcpSocket::disconnected, this, [this](){
-        qDebug() << "Клиент отключился от сервера!";
+        qDebug() << "Client disconnected from the server!";
     });
 }
 
@@ -80,7 +80,7 @@ void ChatNetwork::userName(const QString &username){
 
         QJsonDocument doc(jsonObj);
         socket_->write(doc.toJson(QJsonDocument::Compact));
-        qDebug() << "Отправлен никнейм на сервер:" << username;
+        qDebug() << "Sent username to server:" << username;
     }
 }
 
@@ -96,15 +96,15 @@ void ChatNetwork::sendMessage(const QString &message){
         QJsonDocument doc(jsonObj);
         QByteArray jsonData = doc.toJson(QJsonDocument::Compact);
 
-        qDebug() << "Отправка сообщения с ID:" << clientId_ << "для" << currentRecipientId_ << "текст:" << message;
+        qDebug() << "Sending message with ID:" << clientId_ << "to" << currentRecipientId_ << "text:" << message;
 
         socket_->write(jsonData);
     } else {
-        qDebug() << "Невозможно отправить сообщение, нет соединения с сервером!";
+        qDebug() << "Cannot send message, no connection to the server!";
     }
 }
 
 void ChatNetwork::selectRecipient(const QString &recipientId) {
     currentRecipientId_ = recipientId;
-    qDebug() << "Выбран активный чат с получателем ID:" << currentRecipientId_;
+    qDebug() << "Active chat selected with recipient ID:" << currentRecipientId_;
 }

@@ -6,7 +6,7 @@ Rectangle {
     id: root
     color: "#0b0f19"
 
-    // Сигнал, который сообщает главной программе, что пользователь нажал войти
+    // Signal that informs the main program that the user clicked login
     signal loginSuccessful(string username)
 
     ColumnLayout {
@@ -14,20 +14,20 @@ Rectangle {
         spacing: 20
         width: 300
 
-        // Заголовок
+        // Header
         Text {
-            text: "Вход в MessTag"
+            text: "Messtag Login"
             color: "white"
             font.bold: true
             font.pixelSize: 24
             Layout.alignment: Qt.AlignHCenter
         }
 
-        // Поле ввода никнейма / ID
+        // Username / ID input field
         TextField {
             id: usernameInput
             Layout.fillWidth: true
-            placeholderText: "Введите ваш ник"
+            placeholderText: "Enter your username"
             color: "white"
             placeholderTextColor: "#6b7280"
             font.pixelSize: 14
@@ -37,18 +37,17 @@ Rectangle {
                 radius: 8
             }
 
-            // Нажатие Enter на клавиатуре тоже вызывает отправку
             onAccepted: loginButton.clicked()
         }
 
-        // Кнопка входа
+        // Login button
         Button {
             id: loginButton
             Layout.fillWidth: true
             height: 40
 
             contentItem: Text {
-                text: "Войти в чат"
+                text: "Enter chat"
                 color: "white"
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
@@ -62,7 +61,7 @@ Rectangle {
 
             onClicked: {
                 if (usernameInput.text.trim() !== "") {
-                    // Передаем введенный текст наружу
+                    // Pass the entered text outside
                     root.loginSuccessful(usernameInput.text.trim())
                 }
             }

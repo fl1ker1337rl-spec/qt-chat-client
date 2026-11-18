@@ -8,28 +8,28 @@ Window {
     visible: true
     title: "MessTag"
 
-    // Переменные состояния
+    // State variables
     property bool isLoggedIn: false
     property string currentUsername: ""
     property string selectedUserId: ""
-    property string selectedUserName: "Выбранный чат"
+    property string selectedUserName: "Selected chat"
 
-    // Словарь для хранения истории сообщений по ID каждого пользователя
+    // Dictionary to store message history by each user's ID
     property var chatHistories: ({})
 
-    // Модель для списка других пользователей онлайн
+    // Model for the online users list
     ListModel {
         id: onlineUsersModel
     }
 
-    // Ловим сигналы из C++
+    // Catching signals from C++
     Connections {
         target: chatNetwork
 
         function onUserListReceived(users) {
             onlineUsersModel.clear()
             for (var i = 0; i < users.length; i++) {
-                // Добавляем в список только тех, кто НЕ является тобой
+                // Add to the list only those who are NOT you
                 if (users[i].name !== currentUsername) {
                     onlineUsersModel.append(users[i])
                 }
@@ -51,7 +51,7 @@ Window {
     }
 
     // ==========================================
-    // 1. ЭКРАН АВТОРИЗАЦИИ
+    // 1. LOGIN SCREEN
     // ==========================================
     Loader {
         id: authLoader
@@ -63,7 +63,7 @@ Window {
         onItemChanged: {
             if (item) {
                 item.loginSuccessful.connect(function(username) {
-                    console.log("Успешный вход под именем:", username)
+                    console.log("Successfully logged in as:", username)
                     currentUsername = username
                     chatNetwork.userName(username);
                     isLoggedIn = true
@@ -73,21 +73,21 @@ Window {
     }
 
     // ==========================================
-    // 2. ОСНОВНОЙ ИНТЕРФЕЙС ЧАТА
+    // 2. MAIN CHAT INTERFACE
     // ==========================================
     Row {
         anchors.fill: parent
         enabled: isLoggedIn
         opacity: isLoggedIn ? 1.0 : 0.2
 
-        // Узкая левая панель
+        // Narrow left panel
         Rectangle {
             width: 70
             height: parent.height
             color: "#0b0f19"
         }
 
-        // Средняя панель (Свой профиль сверху + Список чатов ниже)
+        // Middle panel (Own profile on top + Chat list below)
         Rectangle {
             width: 260
             height: parent.height
@@ -100,7 +100,7 @@ Window {
                 anchors.margins: 10
                 spacing: 10
 
-                // === СТАТИЧНАЯ ПЛАШКА ПРОФИЛЯ СВЕРХУ ===
+                // === STATIC PROFILE PANEL ON TOP ===
                 Rectangle {
                     Layout.fillWidth: true
                     Layout.preferredHeight: 65
@@ -134,14 +134,14 @@ Window {
                                 spacing: 2
 
                                 Text {
-                                    text: currentUsername + " (Вы)"
+                                    text: currentUsername + " (You)"
                                     color: "white"
                                     font.bold: true
                                     font.pixelSize: 14
                                 }
 
                                 Text {
-                                    text: "В сети (Ваш аккаунт)"
+                                    text: "Online (Your account)"
                                     color: "#9ca3af"
                                     font.pixelSize: 12
                                     elide: Text.ElideRight
@@ -150,7 +150,7 @@ Window {
                             }
                         }
 
-                        // Тонкая разделительная черта под профилем
+                        // Thin separator line under profile
                         Rectangle {
                             Layout.fillWidth: true
                             Layout.preferredHeight: 1
@@ -160,7 +160,7 @@ Window {
                     }
                 }
 
-                // === СПИСОК ОСТАЛЬНЫХ ПОЛЬЗОВАТЕЛЕЙ ===
+                // === OTHER USERS LIST ===
                 ListView {
                     id: chatListView
                     Layout.fillWidth: true
@@ -194,7 +194,7 @@ Window {
                                     }
                                 }
 
-                                console.log("Выбран чат с пользователем:", model.name);
+                                console.log("Selected chat with user:", model.name);
                             }
                         }
 
@@ -242,7 +242,7 @@ Window {
             }
         }
 
-        // Правая панель (Область переписки)
+        // Right panel (Messaging area)
         Rectangle {
             width: parent.width - 330
             height: parent.height
@@ -253,7 +253,7 @@ Window {
                 anchors.margins: 0
                 spacing: 0
 
-                // Шапка чата
+                // Chat header
                 Rectangle {
                     Layout.fillWidth: true
                     height: 55
@@ -265,14 +265,14 @@ Window {
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.left: parent.left
                         anchors.leftMargin: 20
-                        text: selectedUserId === "" ? "Выберите чат из списка слева" : "Чат с: " + selectedUserName
+                        text: selectedUserId === "" ? "Select a chat from the list on the left" : "Chat with: " + selectedUserName
                         color: "white"
                         font.bold: true
                         font.pixelSize: 16
                     }
                 }
 
-                // История сообщений текущего чата
+                // Current chat message history
                 ListView {
                     id: messageListView
                     Layout.fillWidth: true
@@ -295,7 +295,7 @@ Window {
 
                         Column {
                             id: contentCol
-                            readonly property bool isMe: model.sender === "Я"
+                            readonly property bool isMe: model.sender === "Me"
 
                             anchors.right: isMe ? parent.right : undefined
                             anchors.left: isMe ? undefined : parent.left
@@ -304,7 +304,7 @@ Window {
                             Rectangle {
                                 width: parent.width
                                 height: msgText.implicitHeight + 20
-                                color: model.sender === "Я" ? "#2563eb" : "#1f2937"
+                                color: model.sender === "Me" ? "#2563eb" : "#1f2937"
                                 radius: 10
                                 visible: model.text && model.text.trim() !== ""
 
@@ -322,7 +322,7 @@ Window {
                     }
                 }
 
-                // Панель ввода сообщения
+                // Message input panel
                 Rectangle {
                     Layout.fillWidth: true
                     height: 70
@@ -336,7 +336,7 @@ Window {
                         TextField {
                             id: inputField
                             Layout.fillWidth: true
-                            placeholderText: selectedUserId === "" ? "Сначала выберите чат..." : "Написать сообщение..."
+                            placeholderText: selectedUserId === "" ? "Select a chat first..." : "Type a message..."
                             enabled: selectedUserId !== ""
                             color: "white"
                             placeholderTextColor: "#6b7280"
@@ -352,7 +352,7 @@ Window {
 
                         Button {
                             id: sendButton
-                            text: "Отправить"
+                            text: "Send"
                             enabled: selectedUserId !== ""
 
                             contentItem: Text {
@@ -373,12 +373,12 @@ Window {
                                     var msgText = inputField.text
                                     chatNetwork.sendMessage(msgText)
 
-                                    messageModel.append({"sender": "Я", "text": msgText})
+                                    messageModel.append({"sender": "Me", "text": msgText})
 
                                     if (!chatHistories[selectedUserId]) {
                                         chatHistories[selectedUserId] = []
                                     }
-                                    chatHistories[selectedUserId].push({"sender": "Я", "text": msgText})
+                                    chatHistories[selectedUserId].push({"sender": "Me", "text": msgText})
 
                                     inputField.text = ""
                                 }
