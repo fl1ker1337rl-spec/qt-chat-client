@@ -20,7 +20,7 @@ To run this application locally, you need to run both the backend server and thi
 ### 1. Build and Run the Server
 Clone and launch the companion server repository (`cpp-chat-server`):
 ```bash
-git clone https://github.com/fl1ker1337ri-spec/cpp-chat-server.git
+git clone https://github.com/fl1ker1337rl-spec/cpp-chat-server.git
 cd cpp-chat-server
 mkdir build && cd build
 cmake ..
@@ -32,7 +32,7 @@ cmake --build .
 Clone, build, and run this client repository:
 
 ```bash
-git clone https://github.com/fl1ker1337ri-spec/qt-chat-client.git
+git clone https://github.com/fl1ker1337rl-spec/qt-chat-client.git
 cd qt-chat-client
 mkdir build && cd build
 cmake ..
